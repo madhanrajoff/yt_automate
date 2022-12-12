@@ -49,7 +49,9 @@ class PEXELS(OutBound, ABC):
 
         l_path = f"{self.path_to_download}/{'l-' + finder['filename']}"
         Hoop.loop(finder['duration'], path, l_path)
-        return 'Downloaded!', l_path
+
+        finder['path'], finder['l_path'] = path, l_path
+        return 'Downloaded!', finder
 
 
 class PEXELSTest(TestCase):
@@ -62,5 +64,5 @@ class PEXELSTest(TestCase):
         self.PEXELS = PEXELS('meditation', path)
 
     def test(self):
-        test, path = self.PEXELS.download()
+        test, _ = self.PEXELS.download()
         self.assertEqual(test, 'Downloaded!')

@@ -27,7 +27,7 @@ class YouTube(OutBound, ABC):
         for o in obj:
             filename = o['title'] + '.mp4'
             path = f'{self.path_to_download}/{filename}'
-            if not exists(path):
+            if not exists(path.replace('.mp4', '.mp3')):  # to check converted .mp3 file
                 o['filename'] = filename
                 o['filepath'] = path
                 return o
@@ -59,7 +59,9 @@ class YouTube(OutBound, ABC):
         dur_c = dur.count(":")
         duration = datetime.strptime(dur, '%H:%M:%S' if dur_c > 1 else '%M:%S')
         Hoop.loop(duration.minute, path, l_path)
-        return 'Downloaded!', l_path
+
+        finder['path'], finder['l_path'] = path, l_path
+        return 'Downloaded!', finder
 
 
 class YouTubeTest(TestCase):
@@ -72,9 +74,9 @@ class YouTubeTest(TestCase):
         self.search = 'pacha illai song'
 
     def test_video(self):  # pass resolution='high' for high resolution vidoes
-        test, path = YouTube(self.search, path_to_download=self.path).download()
+        test, _ = YouTube(self.search, path_to_download=self.path).download()
         self.assertEqual(test, 'Downloaded!')
 
     def test_audio(self):
-        test, path = YouTube(self.search, path_to_download=self.path, only_audio=True).download()
+        test, _ = YouTube(self.search, path_to_download=self.path, only_audio=True).download()
         self.assertEqual(test, 'Downloaded!')
