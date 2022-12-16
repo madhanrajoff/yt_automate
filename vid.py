@@ -6,6 +6,7 @@ from os.path import exists
 from unittest import TestCase
 
 from main import OutBound, Hoop
+from mapper import Mapper
 
 
 class PEXELS(OutBound, ABC):
@@ -21,12 +22,25 @@ class PEXELS(OutBound, ABC):
     def search(self):
         return self.PEXELS.search_videos
 
-    def finder(self, obj):
+    def finder(self, obj, thr_db=False):
+        find = False
         for o in obj:
             filename = o['url'].split('/')[-2] + '.mp4'
             path = f'{self.path_to_download}/{filename}'
-            if not exists(path):
+            if thr_db:
+                mapper = Mapper()
+                q_res = mapper.get('video', filename)
+                print('video q_res - ', q_res)
+                if not q_res:
+                    mapper.insert('video', filename)
+                    find = True
+            else:
+                if not exists(path):
+                    find = True
+
+            if find:
                 o['filename'] = filename
+                o['filepath'] = path
                 return o
 
     def download(self):
@@ -34,12 +48,12 @@ class PEXELS(OutBound, ABC):
         per_page = 80  # MAX
         search = self.search()
         search_videos = search(self.attr, page=page, per_page=per_page)
-        finder = self.finder(search_videos['videos'])
+        finder = self.finder(search_videos['videos'], thr_db=True)
 
         while not finder:
             page += 1
             search_videos = search(self.attr, page=page, per_page=per_page)
-            finder = self.finder(search_videos['videos'])
+            finder = self.finder(search_videos['videos'], thr_db=True)
 
         path = f"{self.path_to_download}/{finder['filename']}"
         url_video = 'https://www.pexels.com/video/' + str(finder['id']) + '/download'

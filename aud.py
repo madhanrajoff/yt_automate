@@ -9,6 +9,7 @@ from pytube import YouTube as PyTube
 from datetime import datetime
 
 from main import OutBound, Hoop
+from mapper import Mapper
 
 # TODO:
 from pytube.exceptions import LiveStreamError
@@ -23,21 +24,34 @@ class YouTube(OutBound, ABC):
     def search(self):
         return VideosSearch(self.attr)
 
-    def finder(self, obj):
+    def finder(self, obj, thr_db=False):
+        find = False
         for o in obj:
             filename = o['title'] + '.mp4'
+            c_filename = filename.replace('.mp4', '.mp3')
             path = f'{self.path_to_download}/{filename}'
-            if not exists(path.replace('.mp4', '.mp3')):  # to check converted .mp3 file
+            if thr_db:
+                mapper = Mapper()
+                q_res = mapper.get('audio', c_filename)
+                print('audio q_res - ', q_res)
+                if not q_res:
+                    mapper.insert('audio', c_filename)
+                    find = True
+            else:
+                if not exists(path.replace('.mp4', '.mp3')):  # to check converted .mp3 file
+                    find = True
+
+            if find:
                 o['filename'] = filename
                 o['filepath'] = path
                 return o
 
     def download(self):
         search = self.search()
-        finder = self.finder(search.result()['result'])
+        finder = self.finder(search.result()['result'], thr_db=True)
         while not finder:
             search.next()
-            finder = self.finder(search.result()['result'])
+            finder = self.finder(search.result()['result'], thr_db=True)
 
         video = PyTube(finder['link'])
         if self.only_audio:  # To download audio use: only_audio=True
