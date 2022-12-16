@@ -18,7 +18,8 @@ class Blend:
         _vid, vid = PEXELS(self.v_attr, path_to_download=getcwd() + f'/vid').download()
 
         # rephrase
-        f_name = Paraphraser(vid['filename']).rephrase() + '.mp4'
+        f_name = Paraphraser(vid['filename']).rephrase()
+        f_name_with_ext = f_name + '.mp4'
 
         _aud, aud = YouTube(f_name, path_to_download=getcwd() + f'/aud', only_audio=True).download()
 
@@ -30,12 +31,12 @@ class Blend:
         #                 'l-Water Sounds for Sleep or Focus | White Noise Stream 10 Hours.mp3'
 
         cmd = f"ffmpeg -i '{vid['l_path']}' -i '{aud['l_path']}' -c:v copy -c:a aac " \
-              f"'{self.path_to_download}/{f_name}'"
+              f"'{self.path_to_download}/{f_name_with_ext}'"
         subprocess.run(cmd, shell=True)
 
         sync = Sync()
-        f_path = f'{self.path_to_download}/{f_name}'
-        sync.upload(f_path, f_name.replace('.mp4', ''), self.v_attr)
+        f_path = f'{self.path_to_download}/{f_name_with_ext}'
+        sync.upload(f_path, f_name, self.v_attr)
 
         return 'Blended!'
 
