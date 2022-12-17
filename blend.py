@@ -21,7 +21,7 @@ class Blend:
         f_name = Paraphraser(vid['filename']).rephrase()
         f_name_with_ext = f_name + '.mp4'
 
-        _aud, aud = YouTube(f_name, path_to_download=getcwd() + f'/aud', only_audio=True).download()
+        _aud, aud = YouTube(f_name + ' music', path_to_download=getcwd() + f'/aud', only_audio=True).download()
 
         # vid, aud = {}, {}
         # vid['filename'] = 'soft-waves-lapping-on-sandy-shores-2335977.mp4'
