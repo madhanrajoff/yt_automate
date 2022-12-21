@@ -1,11 +1,11 @@
 import requests
 
 from abc import ABC
-from os import getcwd, mkdir
+from os import getcwd
 from os.path import exists
 from unittest import TestCase
 
-from main import OutBound, Hoop
+from main import OutBound, Hoop, Mkdir
 from mapper import Mapper
 
 
@@ -15,19 +15,22 @@ class PEXELS(OutBound, ABC):
     API_KEY = "563492ad6f917000010000016276cad7b7e145bbb5344f4080dcb7a5"
     PEXELS = Pexels(API_KEY)
 
-    def __init__(self, attr, path_to_download=getcwd()):
-        self.attr, self.path_to_download = attr, path_to_download
+    def __init__(self, attr, path_to_download=getcwd(), thr_db=False):
+        self.attr, self.path_to_download, self.thr_db = attr, path_to_download, thr_db
+
+        self.path_to_download = path_to_download if path_to_download else Mkdir.create('vid')
+
         super(PEXELS, self).__init__()
 
     def search(self):
         return self.PEXELS.search_videos
 
-    def finder(self, obj, thr_db=False):
+    def finder(self, obj):
         find = False
         for o in obj:
             filename = o['url'].split('/')[-2] + '.mp4'
             path = f'{self.path_to_download}/{filename}'
-            if thr_db:
+            if self.thr_db:
                 mapper = Mapper()
                 q_res = mapper.get('video', filename)
                 print('video q_res - ', q_res)
@@ -48,12 +51,12 @@ class PEXELS(OutBound, ABC):
         per_page = 80  # MAX
         search = self.search()
         search_videos = search(self.attr, page=page, per_page=per_page)
-        finder = self.finder(search_videos['videos'], thr_db=True)
+        finder = self.finder(search_videos['videos'])
 
         while not finder:
             page += 1
             search_videos = search(self.attr, page=page, per_page=per_page)
-            finder = self.finder(search_videos['videos'], thr_db=True)
+            finder = self.finder(search_videos['videos'])
 
         path = f"{self.path_to_download}/{finder['filename']}"
         url_video = 'https://www.pexels.com/video/' + str(finder['id']) + '/download'
@@ -71,11 +74,7 @@ class PEXELS(OutBound, ABC):
 class PEXELSTest(TestCase):
 
     def setUp(self):
-        path = getcwd() + '/vid'
-        if not exists(path):
-            mkdir(path)
-
-        self.PEXELS = PEXELS('meditation', path)
+        self.PEXELS = PEXELS('meditation')
 
     def test(self):
         test, _ = self.PEXELS.download()

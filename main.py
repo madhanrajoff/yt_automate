@@ -1,6 +1,9 @@
 import abc
 import subprocess
 
+from os import getcwd, mkdir
+from os.path import exists
+
 
 class Assistance:
     pass
@@ -37,3 +40,12 @@ class Hoop:
 
         if cmd:
             subprocess.run(cmd, shell=True)
+
+
+class Mkdir:
+    @staticmethod
+    def create(dir_name):
+        path = f'{getcwd()}/{dir_name}'
+        if not exists(path):
+            mkdir(path)
+        return path
