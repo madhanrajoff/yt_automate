@@ -28,7 +28,7 @@ class Paraphraser:
             torch.cuda.manual_seed_all(seed)
 
     def cleansing(self, sentence):
-        unwanted = ['-']
+        unwanted = ['-', '.mp4']
         for ch in unwanted:
             if ch in sentence:
                 sentence = sentence.split(ch)

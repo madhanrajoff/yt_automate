@@ -16,11 +16,10 @@ class Sync:
         self.api_version = 'v3'
         self.scopes = ['https://www.googleapis.com/auth/youtube.upload']
 
-        self.key_mapper = {
-            'water': {'des': 'Watching this video and listening to the water drips can help you unwind.',
-                      'tags': ['meditationmusic', 'meditation', 'relaxingmusic', 'yogamusic', 'relax', 'sleepmusic',
-                               'calmmusic', 'healingmusic', 'nature', 'relaxation', 'mindfulness', 'soundhealing']}
-        }
+        self.default = {
+            'des': 'Watching this video and listening to the water drips can help you unwind.',
+            'tags': ['meditationmusic', 'meditation', 'relaxingmusic', 'yogamusic', 'relax', 'sleepmusic',
+                     'calmmusic', 'healingmusic', 'nature', 'relaxation', 'mindfulness', 'soundhealing']}
 
     def service(self):
         cred = None
@@ -49,7 +48,7 @@ class Sync:
             print(e)
             return None
 
-    def upload(self, file_p='', file_n='', attr=''):
+    def upload(self, file_p='', file_n=''):
         now = dt.now()
         upload_date_time = dt(now.year, now.month, now.day, now.hour, now.minute,
                               int(now.second)).isoformat() + '.000Z'
@@ -58,8 +57,8 @@ class Sync:
             'snippet': {
                 'categoryId': 23,
                 'title': file_n,
-                'description': self.key_mapper[attr]['des'],
-                'tags': self.key_mapper[attr]['tags']
+                'description': self.default['des'],
+                'tags': self.default['tags']
             },
             'status': {
                 'privacyStatus': 'public',

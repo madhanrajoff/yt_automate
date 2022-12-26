@@ -5,7 +5,7 @@ from os import getcwd
 from os.path import exists
 from unittest import TestCase
 
-from main import OutBound, Hoop, Mkdir
+from main import OutBound, Hoop, FileHandler
 from mapper import Mapper
 
 
@@ -18,7 +18,7 @@ class PEXELS(OutBound, ABC):
     def __init__(self, attr, path_to_download=getcwd(), thr_db=False):
         self.attr, self.path_to_download, self.thr_db = attr, path_to_download, thr_db
 
-        self.path_to_download = path_to_download if path_to_download else Mkdir.create('vid')
+        self.path_to_download = path_to_download if path_to_download else FileHandler.mkdir('vid')
 
         super(PEXELS, self).__init__()
 

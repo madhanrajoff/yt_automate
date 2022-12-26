@@ -1,8 +1,8 @@
 import abc
 import subprocess
 
-from os import getcwd, mkdir
-from os.path import exists
+from os import getcwd, mkdir, remove, listdir
+from os.path import exists, isfile, isdir
 
 
 class Assistance:
@@ -42,10 +42,22 @@ class Hoop:
             subprocess.run(cmd, shell=True)
 
 
-class Mkdir:
+class FileHandler:
     @staticmethod
-    def create(dir_name):
+    def mkdir(dir_name):
         path = f'{getcwd()}/{dir_name}'
         if not exists(path):
             mkdir(path)
         return path
+
+    @staticmethod
+    def delete(path):
+        try:
+            if isfile(path):
+                remove(path)
+            elif isdir(path):
+                l_dir = listdir(path)
+                for p in l_dir:
+                    remove(p)
+        except OSError as error:
+            print(f"File path can not be removed, for detailed info - {error}")

@@ -7,50 +7,54 @@ from vid import PEXELS
 from aud import YouTube
 from yt_sync import Sync
 from paraphraser import Paraphraser
-from main import Mkdir
+from main import FileHandler
 
 
 class Blend:
-    def __init__(self, v_attr, specific_aud, path_to_download=None):
-        self.v_attr, self.specific_aud = v_attr, specific_aud
+    def __init__(self, v_attr, path_to_download=None, thr_db=False):
+        self.v_attr = v_attr
+        self.thr_db = thr_db
+        self.path_to_download = path_to_download if path_to_download else FileHandler.mkdir('blend')
 
-        self.path_to_download = path_to_download if path_to_download else Mkdir.create('blend')
-
-    def stir(self):
+    def create_vid(self):
         _vid, vid = PEXELS(self.v_attr, path_to_download=getcwd() + f'/vid').download()
+        return vid['filename'], vid['l_path']
 
-        # rephrase
-        f_name = Paraphraser(vid['filename']).rephrase()
-        f_name_with_ext = f_name + '.mp4'
-
+    @staticmethod
+    def create_aud(vid_title, specific=''):
         # To download any specific audio pass title as specific argument
-        _aud, aud = YouTube(f_name + ' music', path_to_download=getcwd() + f'/aud', only_audio=True,
-                            specific=self.specific_aud).download()
+        _aud, aud = YouTube(vid_title + 'music', path_to_download=getcwd() + f'/aud',
+                            only_audio=True, specific=specific).download()
+        return aud['l_path']
 
-        # vid, aud = {}, {}
-        # f_name = 'motorboat travelling on a body of water'
-        # f_name_with_ext = 'motorboat travelling on a body of water.mp4'
-        # vid['l_path'] = '/Users/apple/Documents/PycharmProjects/yt_automate/vid/l-motorboat-traveling-across-a-body-of-water-2711213.mp4'
-        # aud['l_path'] = '/Users/apple/Documents/PycharmProjects/yt_automate/aud/l-Boat No Copyright Videos With No Copyright Music - Stock Footage - FreeCinematics.mp3'
+    def stir(self, **f):  # f - file arguments, create vid and aud files if create one_exists in f
+        if f.get('create_one'):
+            f['v_name'], f['v_p'] = self.create_vid()
+            # To download any specific audio pass title as specific argument
+            f['a_p'] = self.create_aud(f['v_name'] + 'music')
 
-        cmd = f"ffmpeg -i '{vid['l_path']}' -i '{aud['l_path']}' -c:v copy -c:a aac " \
-              f"'{self.path_to_download}/{f_name_with_ext}'"
+        print(f['v_p'])
+        print(f['a_p'])
+        cmd = f"ffmpeg -i '{f['v_p']}' -i '{f['a_p']}' -c:v copy -c:a aac " \
+              f"'{self.path_to_download}/{f['v_name']}'"
+        print(cmd)
         subprocess.run(cmd, shell=True)
 
         sync = Sync()
-        f_path = f'{self.path_to_download}/{f_name_with_ext}'
-        print('video', vid['l_path'])
-        print('audio', aud['l_path'])
-        print('blend', f_path)
-        sync.upload(f_path, f_name, self.v_attr)
-
+        f_path = f"{self.path_to_download}/{f['v_name']}"
+        # sync.upload(f_path, Paraphraser(f['v_name']).rephrase())
         return 'Blended!'
 
 
 class BlendTest(TestCase):
     def setUp(self):
-        self.Blend = Blend('water', 'water music')
+        self.Blend = Blend('water', thr_db=True)
 
     def test_stir(self):
-        blend = self.Blend.stir()
+        blend = self.Blend.stir(create_one=True)
         self.assertEqual(blend, 'Blended!')
+
+        # to delete the uploaded files
+        dir_name = ['audio', 'video', 'blend']
+        for dir_ in dir_name:
+            FileHandler.delete(f'{getcwd()}/{dir_}')

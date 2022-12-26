@@ -1,5 +1,7 @@
 import sqlite3
 
+from os import listdir, getcwd, remove
+
 
 class Mapper:
     def __init__(self):
@@ -40,9 +42,9 @@ class Mapper:
             self.execute(q, commit=False)
         self.commit()
 
-    def insert(self, table, value):
+    def insert(self, table, value, commit=True):
         q = f"INSERT INTO {self.tb_props[table]['name']} VALUES ('{value}')"
-        self.execute(q)
+        self.execute(q, commit=commit)
 
     def get(self, table, value):
         q = f"SELECT * FROM {self.tb_props[table]['name']} WHERE {table} = '{value}'"
@@ -62,15 +64,42 @@ class Mapper:
         exe = self.execute(q)
         return exe
 
+    @staticmethod
+    def delete_file(f_path, is_dir=False):
+        if is_dir:
+            l_dir = listdir(f_path)
+            # print(l_dir)
+            for f in l_dir:
+                try:
+                    remove(f'{f_path}/{f}')
+                    print("% s removed successfully" % f_path)
+                except OSError as error:
+                    print(error)
+                    print("File path can not be removed")
+        else:
+            try:
+                remove(f'{f_path}/{f}')
+                print("% s removed successfully" % f_path)
+            except OSError as error:
+                print(error)
+                print("File path can not be removed")
+
+    def insert_files(self, table, dir_name):  # provide the dir name which is the root folder contains files
+        path = f'{getcwd()}/{dir_name}'
+        l_dir = listdir(path)
+        for f in l_dir:
+            if f[0] != 'l':
+                try:
+                    self.insert(table, f, commit=False)
+                except sqlite3.IntegrityError:
+                    pass
+        self.commit()
+
 
 if __name__ == '__main__':
     mapper = Mapper()
 
     # mapper.create_table()
-
-    # mapper.delete('video', 'drone-footage-of-ocean-waves-7666608.mp4', 'sea-water-blue-ocean-7513671.mp4')
-    # mapper.list('video')
-
-    # mapper.delete('audio', '3 HOURS of GENTLE NIGHT RAIN, Rain Sounds to Sleep, Study, Relax, Reduce Stress, help insomnia.mp3', 'sea-water-blue-ocean-7513671.mp4')
-    mapper.list('audio')
-
+    # mapper.list('audio')
+    # mapper.insert_files('audio', 'aud')
+    # mapper.insert_files('video', 'vid')

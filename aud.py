@@ -9,7 +9,7 @@ from pytube import YouTube as PyTube
 from datetime import datetime
 from pprint import pprint as pp
 
-from main import OutBound, Hoop, Mkdir
+from main import OutBound, Hoop, FileHandler
 from mapper import Mapper
 
 # TODO:
@@ -24,10 +24,9 @@ class YouTube(OutBound, ABC):
         self.thr_db = thr_db
         self.view_count, self.specific = 1, specific
 
-        self.path_to_download = path_to_download if path_to_download else Mkdir.create('aud')
+        self.path_to_download = path_to_download if path_to_download else FileHandler.mkdir('aud')
 
         super(YouTube, self).__init__()
-
 
     def search(self):
         attr = self.attr if not self.specific else self.specific
