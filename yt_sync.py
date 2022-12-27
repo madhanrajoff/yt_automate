@@ -1,5 +1,6 @@
 import pickle
 import os
+import sys
 
 from datetime import datetime as dt
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -11,7 +12,7 @@ from google.auth.transport.requests import Request
 class Sync:
 
     def __init__(self):
-        self.client_secret_file = 'client_secrets.json'
+        self.client_secret_file = 'web_client_secrets.json'
         self.api_name = 'youtube'
         self.api_version = 'v3'
         self.scopes = ['https://www.googleapis.com/auth/youtube.upload']
@@ -82,9 +83,10 @@ class Sync:
         ).execute()
         """
 
-        print("Upload Successful!")
+        return "Upload Successful!"
 
 
 if __name__ == "__main__":
+    arg = sys.argv
     sync = Sync()
-    sync.upload(file_p='./aud/Love Today - Pacha Elai Lyric | @Pradeep Ranganathan  | Yuvan Shankar Raja | AGS.mp4')
+    sync.upload(arg[0], arg[1])

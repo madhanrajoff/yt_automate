@@ -1,4 +1,5 @@
 import requests
+import shutil
 
 from abc import ABC
 from os import getcwd
@@ -66,8 +67,9 @@ class PEXELS(OutBound, ABC):
 
         l_path = f"{self.path_to_download}/{'l-' + finder['filename']}"
         Hoop.loop(finder['duration'], path, l_path)
-
-        finder['path'], finder['l_path'] = path, l_path
+        mv = path.replace('vid', 'static')
+        shutil.move(path, mv)
+        finder['path'], finder['l_path'] = mv, l_path
         return 'Downloaded!', finder
 
 
