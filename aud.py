@@ -72,27 +72,29 @@ class YouTube(OutBound, ABC):
                 video.streams.get_lowest_resolution()
 
         stream.download(filename=finder['filename'], output_path=self.path_to_download)
-        path = f"{self.path_to_download}/{finder['title']}.mp3"
-        if self.only_audio:  # mp3 converter
-            cmd = f"ffmpeg -i '{finder['filepath']}' -vn '{path}'"
-            subprocess.run(cmd, shell=True)
 
-            remove(finder['filepath'])  # delete .mp4 format
+        l_path_mp4 = f"{self.path_to_download}/l-{finder['title']}" + ".mp4"
+        l_path_mp3 = f"{self.path_to_download}/l-{finder['title']}" + ".mp3"
 
-        l_path = f"{self.path_to_download}/l-{finder['title']}.mp3"
         dur = finder['duration']
         dur_c = dur.count(":")
         duration = datetime.strptime(dur, '%H:%M:%S' if dur_c > 1 else '%M:%S')
-        Hoop.loop(duration.minute, path, l_path)
+        Hoop.loop(duration.minute, finder['filepath'], l_path_mp4)
 
-        finder['path'], finder['l_path'] = path, l_path
+        if self.only_audio:  # mp3 converter
+            cmd = f"ffmpeg -i '{l_path_mp4}' -vn '{l_path_mp3}'"
+            subprocess.run(cmd, shell=True)
+
+            remove(l_path_mp4)  # delete .mp4 format
+
+        finder['path'], finder['l_path'] = finder['filepath'], l_path_mp3
         return 'Downloaded!', finder
 
 
 class YouTubeTest(TestCase):
 
     def setUp(self):
-        self.search = 'Motorboat Traveling Across A Body Of Water music'
+        self.search = 'Raging Waterfall Ambience White Noise for Sleeping'
 
     def test_video(self):  # pass resolution='high' for high resolution vidoes
         test, _ = YouTube(self.search).download()

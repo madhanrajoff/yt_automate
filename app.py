@@ -10,17 +10,27 @@ CORS(app)  # This will enable CORS for all routes
 
 @app.route('/player', methods=["GET", "POST"])
 def player():
+    def inner(s_k):
+        # blend = Blend(s_k, thr_db=True)
+        blend = Blend(s_k)
+        f_name, f_path = blend.create_vid()
+        return render_template('player.html', f_name=f_name, f_path=f_path, search_key=s_k)
+
     if r.method == 'POST':
-        vid = r.form.get('pexels')
+        search_key = r.form.get('pexels')
         aud = r.form.get('audio')
-        if vid:
-            blend = Blend(vid, thr_db=True)
-            f_name, f_path = blend.create_vid()
-            return render_template('player.html', f_name=f_name, f_path=f_path)
+        skip = r.form.get('skip')
+        skip_audio = r.form.get('skip_audio')
+        print(search_key, aud, skip, skip_audio)
+        if skip_audio:
+            blend = Blend(aud)
+            return blend.stir(v_name=r.form['video'], v_p=r.form['video_path'], skip_audio=True)
         elif aud:
-            blend = Blend(aud, thr_db=True)
+            blend = Blend(aud)
             a_p = blend.create_aud(aud)
             return blend.stir(v_name=r.form['video'], v_p=r.form['video_path'], a_p=a_p)
+        elif search_key or skip:
+            return inner(search_key)
     return render_template('player.html')
 
 

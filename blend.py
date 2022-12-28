@@ -1,5 +1,6 @@
-import subprocess
+import shutil
 
+from subprocess import run
 from os import getcwd
 from unittest import TestCase
 
@@ -32,18 +33,21 @@ class Blend:
             # To download any specific audio pass title as specific argument
             f['a_p'] = self.create_aud(f['v_name'] + 'music')
 
-        print(f['v_p'])
-        print(f['a_p'])
-        cmd = f"ffmpeg -i '{f['v_p']}' -i '{f['a_p']}' -map 0:v -map 1:a -c:v copy -shortest " \
-              f"'{self.path_to_download}/{f['v_name']}'"
-        print(cmd)
-        subprocess.run(cmd, shell=True)
+        f_path = f"{self.path_to_download}/{f['v_name']}"
+        if f.get('skip_merge'):
+            print(f['v_p'])
+            print(f['a_p'])
+            cmd = f"ffmpeg -i '{f['v_p']}' -i '{f['a_p']}' -map 0:v -map 1:a -c:v copy -shortest " \
+                  f"'{f_path}'"
+            print(cmd)
+            run(cmd, shell=True)
+        elif f.get('skip_audio'):
+            f_path = f['v_p'].replace('vid/', 'blend/l-')
+            shutil.move(f['v_p'], f_path)
 
         sync = Sync()
-        f_path = f"{self.path_to_download}/{f['v_name']}"
         upload_name = Paraphraser(f["v_name"]).rephrase()
-        subprocess.call(f'python3 paraphraser.py {f_path} {upload_name}', shell=True)
-        # sync.upload(f_path, Paraphraser(f['v_name']).rephrase())
+        sync.upload(f_path, upload_name)
         return 'Blended!'
 
 
@@ -59,3 +63,13 @@ class BlendTest(TestCase):
         dir_name = ['audio', 'video', 'blend']
         for dir_ in dir_name:
             FileHandler.delete(f'{getcwd()}/{dir_}')
+
+    def test_stir_with_file_paths(self):
+        blend = Blend('')
+        blend = blend.stir(v_p='/Users/apple/Documents/PycharmProjects/yt_automate/vid/l-landscape-nature-sunset-man-4441007.mp4', a_p='/Users/apple/Documents/PycharmProjects/yt_automate/aud/l-15 Min. Meditation Music for Positive Energy - Buddhist Meditation Music l Relax Mind Body.mp3', v_name='landscape-nature-sunset-man-4441007.mp4')
+        self.assertEqual(blend, 'Blended!')
+
+    def test_stir_upload_direct(self):
+        blend = Blend('')
+        blend = blend.stir(skip_merge=True, v_name='landscape-nature-sunset-man-4441007.mp4')
+        self.assertEqual(blend, 'Blended!')

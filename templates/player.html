@@ -4,22 +4,27 @@
     <video width="250" height="200" controls>
         <source src={{url_for('static', filename=f_name)}} type="video/mp4"/>
     </video>
+{% endif %}
 
-    <form method="post">
+{% block content %}
+  <form method="post">
+    <label for="pexels">Pexels</label>
+    {% if search_key %}
+        <input name="pexels" id="pexels" value={{search_key}} required>
+    {% else %}
+        <input name="pexels" id="pexels" required>
+    {% endif %}
+    <input type="submit" name="search" value="Search"><br>
+    {% if f_name %}
         <label for="video_path">FPath</label>
             <input name="video_path" id="video_path" value={{f_path}} required><br>
         <label for="video">Video</label>
             <input name="video" id="video" value={{f_name}} required><br>
         <label for="audio">Audio</label>
-            <input name="audio" id="audio" required>
-        <input type="submit" value="Merge">
-    </form>
-{% else %}
-    {% block content %}
-      <form method="post">
-        <label for="pexels">Pexels</label>
-        <input name="pexels" id="pexels" required>
-        <input type="submit" value="Search">
-      </form>
-    {% endblock %}
-{% endif %}
+            <input name="audio" id="audio">
+        <input type="submit" name="skip" value="Skip">
+        <input type="submit" name="skip_audio" value="SkipAudio">
+        <input type="submit" name="merge" value="Merge">
+    {% endif %}
+  </form>
+{% endblock %}
