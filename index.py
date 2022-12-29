@@ -12,6 +12,10 @@ app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
 
+@app.route('/')
+def index():
+    return "Hello Bitch!"
+
 @app.route('/player', methods=["GET", "POST"])
 def player():
     def inner(s_k):
