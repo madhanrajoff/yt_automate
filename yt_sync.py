@@ -8,6 +8,8 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.auth.transport.requests import Request
 
+from paraphraser import Paraphraser
+
 
 class Sync:
 
@@ -70,11 +72,11 @@ class Sync:
 
         media_file = MediaFileUpload(file_p, chunksize=-1, resumable=True)
         g_api = self.service()
-        response_upload = g_api.videos().insert(
-            part='snippet,status',
-            body=request_body,
-            media_body=media_file
-        ).execute()
+        # response_upload = g_api.videos().insert(
+        #     part='snippet,status',
+        #     body=request_body,
+        #     media_body=media_file
+        # ).execute()
 
         """
         g_api.thumbnails().set(
@@ -89,4 +91,8 @@ class Sync:
 if __name__ == "__main__":
     arg = sys.argv
     sync = Sync()
-    sync.upload(arg[0], arg[1])
+    f_name = 'landscape-nature-sunset-man-4441007.mp4'
+    f_path = os.getcwd() + f'/blend/{f_name}'
+    upload_name = Paraphraser(phrase=f_name).rephrase()
+    sync.upload(f_path, upload_name)
+    # sync.upload(arg[0], arg[1])

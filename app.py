@@ -1,8 +1,12 @@
+import os
+
 from flask import Flask, request as r
 from flask_cors import CORS
 from flask import render_template
 
 from blend import Blend
+from yt_sync import Sync
+from paraphraser import Paraphraser
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -32,6 +36,17 @@ def player():
         elif search_key or skip:
             return inner(search_key)
     return render_template('player.html')
+
+
+@app.route('/direct_upload', methods=["GET", "POST"])
+def direct_upload():
+    print("In Bitch!")
+    sync = Sync()
+    f_name = 'beauty-of-waterfalls-2098989.mp4'
+    f_path = os.getcwd() + f'/blend/{f_name}'
+    upload_name = Paraphraser(phrase=f_name).rephrase()
+    sync.upload(f_path, upload_name)
+    return "Bitch!"
 
 
 if __name__ == '__main__':
