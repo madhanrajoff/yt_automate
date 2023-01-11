@@ -17,7 +17,8 @@ class PEXELS(OutBound, ABC):
     PEXELS = Pexels(API_KEY)
 
     def __init__(self, attr, path_to_download=getcwd(), thr_db=False):
-        self.attr, self.path_to_download, self.thr_db = attr, path_to_download, thr_db
+        self.attr, self.thr_db = attr, thr_db
+        self.path_to_download = path_to_download if path_to_download else FileHandler.mkdir('vid')
 
         super(PEXELS, self).__init__()
 

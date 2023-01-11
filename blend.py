@@ -15,18 +15,15 @@ class Blend:
     def __init__(self, v_attr, path_to_download=None, thr_db=False):
         self.v_attr = v_attr
         self.thr_db = thr_db
-        if path_to_download:
-            self.path_to_download = path_to_download
-        else:
-            FileHandler.mkdir('blend', 'vid', 'aud')
+        self.path_to_download = path_to_download if path_to_download else FileHandler.mkdir('blend')
 
     def create_vid(self):
-        _vid, vid = PEXELS(self.v_attr, path_to_download=getcwd() + f'/vid', thr_db=self.thr_db).download()
+        _vid, vid = PEXELS(self.v_attr, thr_db=self.thr_db).download()
         return vid['filename'], vid['l_path']
 
     def create_aud(self, vid_title, specific=''):
         # To download any specific audio pass title as specific argument
-        _aud, aud = YouTube(vid_title + 'music', path_to_download=getcwd() + f'/aud',
+        _aud, aud = YouTube(vid_title + 'music',
                             only_audio=True, specific=specific, thr_db=self.thr_db).download()
         return aud['l_path']
 

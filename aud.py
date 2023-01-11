@@ -18,11 +18,12 @@ from pytube.exceptions import LiveStreamError
 
 class YouTube(OutBound, ABC):
     def __init__(self, attr, path_to_download=None, only_audio=False, resolution='low', thr_db=False, specific=''):
-        self.attr, self.path_to_download = attr, path_to_download
+        self.attr = attr
         self.only_audio, self.resolution = only_audio, resolution
-
         self.thr_db = thr_db
         self.view_count, self.specific = 1, specific
+        self.path_to_download = path_to_download if path_to_download else FileHandler.mkdir('aud')
+
         super(YouTube, self).__init__()
 
     def search(self):
