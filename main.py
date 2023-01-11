@@ -44,11 +44,11 @@ class Hoop:
 
 class FileHandler:
     @staticmethod
-    def mkdir(dir_name):
-        path = f'{getcwd()}/{dir_name}'
-        if not exists(path):
-            mkdir(path)
-        return path
+    def mkdir(*dir_names):
+        for dir_name in dir_names:
+            path = f'{getcwd()}/{dir_name}'
+            if not exists(path):
+                mkdir(path)
 
     @staticmethod
     def delete(path):

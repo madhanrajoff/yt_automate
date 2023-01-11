@@ -59,7 +59,8 @@ class Mapper:
         return exe
 
     def delete(self, table, *value):
-        q = f"DELETE FROM {self.tb_props[table]['name']} WHERE {table} IN {value};"
+        search_criteria = f'IN {value}' if len(value) > 1 else f"= ('{value[0]}')"
+        q = f"DELETE FROM {self.tb_props[table]['name']} WHERE {table} {search_criteria};"
         print(q)
         exe = self.execute(q)
         return exe
@@ -100,6 +101,8 @@ if __name__ == '__main__':
     mapper = Mapper()
 
     # mapper.create_table()
-    # mapper.list('audio')
+    # mapper.list('video')
     # mapper.insert_files('audio', 'aud')
     # mapper.insert_files('video', 'vid')
+
+    mapper.delete('video', 'l-a-woman-meditating-8391363.mp4')

@@ -23,9 +23,6 @@ class YouTube(OutBound, ABC):
 
         self.thr_db = thr_db
         self.view_count, self.specific = 1, specific
-
-        self.path_to_download = path_to_download if path_to_download else FileHandler.mkdir('aud')
-
         super(YouTube, self).__init__()
 
     def search(self):

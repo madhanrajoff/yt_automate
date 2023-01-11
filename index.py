@@ -16,12 +16,13 @@ CORS(app)  # This will enable CORS for all routes
 def index():
     return "Hello Bitch!"
 
+
 @app.route('/player', methods=["GET", "POST"])
 def player():
     def inner(s_k):
         # blend = Blend(s_k, thr_db=True)
-        blend = Blend(s_k)
-        f_name, f_path = blend.create_vid()
+        _blend = Blend(s_k, thr_db=True)
+        f_name, f_path = _blend.create_vid()
         return render_template('player.html', f_name=f_name, f_path=f_path, search_key=s_k)
 
     if r.method == 'POST':
@@ -46,7 +47,7 @@ def player():
 def direct_upload():
     print("In Bitch!")
     sync = Sync()
-    f_name = 'beauty-of-waterfalls-2098989.mp4'
+    f_name = 'a-buddhist-monk-praying-outdoors-5385964.mp4'
     f_path = os.getcwd() + f'/blend/{f_name}'
     upload_name = Paraphraser(phrase=f_name).rephrase()
     sync.upload(f_path, upload_name)
@@ -54,4 +55,4 @@ def direct_upload():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

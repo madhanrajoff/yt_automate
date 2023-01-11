@@ -14,7 +14,7 @@ from paraphraser import Paraphraser
 class Sync:
 
     def __init__(self):
-        self.client_secret_file = 'web_client_secrets.json'
+        self.client_secret_file = 'destop_client.json'
         self.api_name = 'youtube'
         self.api_version = 'v3'
         self.scopes = ['https://www.googleapis.com/auth/youtube.upload']
@@ -72,11 +72,11 @@ class Sync:
 
         media_file = MediaFileUpload(file_p, chunksize=-1, resumable=True)
         g_api = self.service()
-        # response_upload = g_api.videos().insert(
-        #     part='snippet,status',
-        #     body=request_body,
-        #     media_body=media_file
-        # ).execute()
+        response_upload = g_api.videos().insert(
+            part='snippet,status',
+            body=request_body,
+            media_body=media_file
+        ).execute()
 
         """
         g_api.thumbnails().set(

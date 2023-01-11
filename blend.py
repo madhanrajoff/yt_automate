@@ -15,7 +15,10 @@ class Blend:
     def __init__(self, v_attr, path_to_download=None, thr_db=False):
         self.v_attr = v_attr
         self.thr_db = thr_db
-        self.path_to_download = path_to_download if path_to_download else FileHandler.mkdir('blend')
+        if path_to_download:
+            self.path_to_download = path_to_download
+        else:
+            FileHandler.mkdir('blend', 'vid', 'aud')
 
     def create_vid(self):
         _vid, vid = PEXELS(self.v_attr, path_to_download=getcwd() + f'/vid', thr_db=self.thr_db).download()
@@ -28,22 +31,23 @@ class Blend:
         return aud['l_path']
 
     def stir(self, **f):  # f - file arguments, create vid and aud files if create one_exists in f
+        f_path = f"{self.path_to_download}/{f['v_name']}"
         if f.get('create_one'):
             f['v_name'], f['v_p'] = self.create_vid()
             # To download any specific audio pass title as specific argument
             f['a_p'] = self.create_aud(f['v_name'] + 'music')
 
-        f_path = f"{self.path_to_download}/{f['v_name']}"
-        if f.get('skip_merge'):
+        elif f.get('skip_audio'):
+            f_path = f['v_p'].replace('vid/', 'blend/')
+            shutil.move(f['v_p'], f_path)
+
+        else:
             print(f['v_p'])
             print(f['a_p'])
             cmd = f"ffmpeg -i '{f['v_p']}' -i '{f['a_p']}' -map 0:v -map 1:a -c:v copy -shortest " \
                   f"'{f_path}'"
             print(cmd)
             run(cmd, shell=True)
-        elif f.get('skip_audio'):
-            f_path = f['v_p'].replace('vid/', 'blend/l-')
-            shutil.move(f['v_p'], f_path)
 
         sync = Sync()
         upload_name = Paraphraser(f["v_name"]).rephrase()
