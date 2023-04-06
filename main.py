@@ -27,7 +27,7 @@ class OutBound(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
 
-class HPPY:
+class HAPPY:
     @classmethod
     def loop(cls, duration, path, l_path):
         cmd = ''
