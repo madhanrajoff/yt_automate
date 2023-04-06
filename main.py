@@ -26,8 +26,7 @@ class OutBound(metaclass=abc.ABCMeta):
     def download(self):
         raise NotImplementedError
 
-
-class HAPPY:
+class Hoop:
     @classmethod
     def loop(cls, duration, path, l_path):
         cmd = ''
